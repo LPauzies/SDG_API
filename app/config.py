@@ -4,9 +4,6 @@ PORT_SERVER="5000"
 API_NAME = "Sustainable Development Goals API"
 APP_VERSION = "1.0"
 
-DATA_ABSOLUTE_PATH = "/home/cair0n/Documents/Projets/SDG_API/app/data/data.csv"
-DATA_PROJECT_PATH = "SDG_API/app/data/data.csv"
-
 class BaseConfig:
     DEBUG = True
 
