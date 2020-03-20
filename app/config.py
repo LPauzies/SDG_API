@@ -4,15 +4,15 @@ PORT_SERVER="5000"
 API_NAME = "Sustainable Development Goals API"
 APP_VERSION = "1.0"
 
-class BaseConfig:
-    DEBUG = True
+DATA_PATH = "/home/cair0n/Documents/Projets/SDG_API/app/services/data/data.csv"
 
-class DevelopmentConfig(BaseConfig):
+class DevelopmentConfig:
+    DEBUG = True
     # SWAGGER Configuration
     SWAGGER_URL = '/api/docs'
     DATA_SWAGGER = 'http://127.0.0.1:5000/swagger'
 
-class ProductionConfig(BaseConfig):
+class ProductionConfig:
     DEBUG = False
     # SWAGGER Configuration
     SWAGGER_URL = '/api/docs'
