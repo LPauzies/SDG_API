@@ -50,7 +50,7 @@ def sdg_formatter(df: pd.DataFrame) -> Any:
                     s = "NULL" if str(row[col] == "nan") else str(row[col])
                     data['extra data'].append("{}:{}".format(col,s))
             topic['data'].append(data)
-        json['topics'].append(topic)
+        json['goals'].append(topic)
     return marshal(json, sdg_formatter_json_fields)
 
 # SDG Formatter Countries
@@ -71,12 +71,12 @@ def sdg_formatter_countries(df: pd.DataFrame) -> Any:
         data['country'] = row['GeoAreaName']
         data['country code'] = row['GeoAreaCode']
         json['countries'].append(data)
-    return marshal(json, countries_fields)
+    return marshal(json, sdg_formatter_countries_countries_fields)
 
 # SDG Formatter Goals
 sdg_formatter_goals_goal_field = {
-    'goal' : fields.String,
-    'goal code' : fields.String
+    'topic' : fields.String,
+    'topic code' : fields.String
 }
 
 sdg_formatter_goals_goals_fields = {
@@ -88,8 +88,8 @@ def sdg_formatter_goals(df: pd.DataFrame) -> Any:
     json['goals'] = []
     for _, row in df.iterrows():
         data = {}
-        data['goal'] = row['SeriesDescription']
-        data['goal code'] = row['SeriesCode']
+        data['topic'] = row['SeriesDescription']
+        data['topic code'] = row['SeriesCode']
         json['goals'].append(data)
     return marshal(json, sdg_formatter_goals_goals_fields)
 
