@@ -2,40 +2,39 @@ from flask_restful import fields, marshal
 from typing import Any
 
 import pandas as pd
-import json as JSON
 
-# Declare the formatting fields for the big API endpoint
-data_fields = {
+# SDG Formatter
+sdg_formatter_data_fields = {
     'time period' : fields.Integer,
     'value' : fields.String,
     'extra data' : fields.List(fields.String)
 }
 
-topic_fields = {
-    'topic code' : fields.String,
-    'topic description' : fields.String,
+sdg_formatter_topic_fields = {
+    'goal code' : fields.String,
+    'goal description' : fields.String,
     'unit' : fields.String,
     'source' : fields.String,
-    'data' : fields.List(fields.Nested(data_fields))
+    'data' : fields.List(fields.Nested(sdg_formatter_data_fields))
 }
 
-json_fields = {
+sdg_formatter_json_fields = {
     'country' : fields.String,
     'country code' : fields.Integer,
-    'topics' : fields.List(fields.Nested(topic_fields))
+    'goals' : fields.List(fields.Nested(sdg_formatter_topic_fields))
 }
 
 def sdg_formatter(df: pd.DataFrame) -> Any:
     json = {}
     json['country'] = df['GeoAreaName'].values[0]
     json['country code'] = df['GeoAreaCode'].values[0]
-    json['topics'] = []
+    json['goals'] = []
     df_serieCode = df.drop(columns=['GeoAreaName', 'GeoAreaCode'])
     for serieCode in df_serieCode.SeriesCode.unique():
         topic = {}
         df_topic = df_serieCode[df_serieCode['SeriesCode'] == serieCode]
-        topic['topic code'] = df_topic['SeriesCode'].values[0]
-        topic['topic description'] = df_topic['SeriesDescription'].values[0]
+        topic['goal code'] = df_topic['SeriesCode'].values[0]
+        topic['goal description'] = df_topic['SeriesDescription'].values[0]
         topic['unit'] = df_topic['Units'].values[0]
         topic['source'] = df_topic['Source'].values[0]
         topic['data'] = []
@@ -47,20 +46,21 @@ def sdg_formatter(df: pd.DataFrame) -> Any:
             data['value'] = row['Value']
             data['extra data'] = []
             for col in cols:
-                if not(col == 'TimePeriod' or col == 'Value'):
+                if col != 'TimePeriod' or col != 'Value':
                     s = "NULL" if str(row[col] == "nan") else str(row[col])
                     data['extra data'].append("{}:{}".format(col,s))
             topic['data'].append(data)
         json['topics'].append(topic)
-    return marshal(json, json_fields)
+    return marshal(json, sdg_formatter_json_fields)
 
-country_field = {
+# SDG Formatter Countries
+sdg_formatter_countries_country_field = {
     'country' : fields.String,
     'country code' : fields.String
 }
 
-countries_fields = {
-    'countries' : fields.List(fields.Nested(country_field))
+sdg_formatter_countries_countries_fields = {
+    'countries' : fields.List(fields.Nested(sdg_formatter_countries_country_field))
 }
 
 def sdg_formatter_countries(df: pd.DataFrame) -> Any:
@@ -73,13 +73,14 @@ def sdg_formatter_countries(df: pd.DataFrame) -> Any:
         json['countries'].append(data)
     return marshal(json, countries_fields)
 
-goal_field = {
+# SDG Formatter Goals
+sdg_formatter_goals_goal_field = {
     'goal' : fields.String,
     'goal code' : fields.String
 }
 
-goals_fields = {
-    'goals' : fields.List(fields.Nested(goal_field))
+sdg_formatter_goals_goals_fields = {
+    'goals' : fields.List(fields.Nested(sdg_formatter_goals_goal_field))
 }
 
 def sdg_formatter_goals(df: pd.DataFrame) -> Any:
@@ -90,4 +91,44 @@ def sdg_formatter_goals(df: pd.DataFrame) -> Any:
         data['goal'] = row['SeriesDescription']
         data['goal code'] = row['SeriesCode']
         json['goals'].append(data)
-    return marshal(json, goals_fields)
+    return marshal(json, sdg_formatter_goals_goals_fields)
+
+# SDG Formatter Goal for a country
+sdg_formatter_goal_country_data_fields = {
+    'time period' : fields.Integer,
+    'value' : fields.String,
+    'extra data' : fields.List(fields.String)
+}
+
+sdg_formatter_goal_country_goals_fields = {
+    'goal' : fields.String,
+    'goal code' : fields.String,
+    'country' : fields.String,
+    'country code' : fields.Integer,
+    'unit' : fields.String,
+    'source' : fields.String,
+    'data' : fields.List(fields.Nested(sdg_formatter_goal_country_data_fields))
+}
+
+def sdg_formatter_goal_country(df: pd.DataFrame) -> Any:
+    json = {}
+    json['goal'] = df['SeriesDescription'].values[0]
+    json['goal code'] = df['SeriesCode'].values[0]
+    json['country'] = df['GeoAreaName'].values[0]
+    json['country code'] = df['GeoAreaCode'].values[0]
+    json['unit'] = df['Units'].values[0]
+    json['source'] = df['Source'].values[0]
+    json['data'] = []
+    df_data = df.drop(columns=['GeoAreaName', 'GeoAreaCode', 'SeriesCode', 'SeriesDescription', 'Units', 'Source'])
+    cols = df_data.columns
+    for _, row in df_data.iterrows():
+        data = {}
+        data['time period'] = row['TimePeriod']
+        data['value'] = row['Value']
+        data['extra data'] = []
+        for col in cols:
+            if col != 'TimePeriod' and col != 'Value':
+                s = "NULL" if str(row[col] == "nan") else str(row[col])
+                data['extra data'].append("{}:{}".format(col,s))
+        json['data'].append(data)
+    return marshal(json,sdg_formatter_goal_country_goals_fields)

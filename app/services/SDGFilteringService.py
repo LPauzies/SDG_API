@@ -16,6 +16,9 @@ def _read_data() -> pd.DataFrame:
 def _is_country_existing(df: pd.DataFrame, country: str) -> bool:
     return country in df.GeoAreaName.values
 
+def _is_topic_existing(df: pd.DataFrame, topic: str) -> bool:
+    return topic in df.SeriesCode.values
+
 def _is_country_contained_in_values(df: pd.DataFrame, country: str) -> bool:
     for country_ in filter(lambda x: " " in x or "-" in x, df.GeoAreaName.values):
         if country in country_:
@@ -52,3 +55,10 @@ def get_countries() -> pd.DataFrame:
 def get_goals() -> pd.DataFrame:
     df = _read_data()
     return df[['SeriesCode', 'SeriesDescription']].drop_duplicates()
+
+def get_topic_from_one_country(country_code: int, topic: str) -> pd.DataFrame:
+    df = get_data_from_one_geographical_code(country_code)
+    if (_is_topic_existing(df, topic)):
+        return df[df['SeriesCode'] == topic]
+    else:
+        raise SDGFilteringException("This topic is not referenced in our API")
