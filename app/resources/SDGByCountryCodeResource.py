@@ -10,7 +10,7 @@ from app.services.SDGFilteringService import SDGFilteringException
 
 class SDGByCountryCodeResource(Resource):
 
-    def get(self, country_code: int) -> Dict[str, Any]:
+    def get(self, country_code: str) -> Dict[str, Any]:
         """
         Get the Sustainable Development Goals data for a selected country code
         ---
@@ -19,9 +19,9 @@ class SDGByCountryCodeResource(Resource):
         parameters:
             - in: path
               name: country_code
-              description: The country code to get the SDG from
+              description: The country code to get the SDG from. (FR for France)
               required: true
-              type: integer
+              type: string
         responses:
             200:
                 description: JSON representing 17 SDG for the country code
@@ -34,9 +34,9 @@ class SDGByCountryCodeResource(Resource):
             return {
                     "message" : "Success",
                     "status" : 200,
-                    "data" : sdg_formatter(get_data_from_one_geographical_code(country_code))
+                    "data" : sdg_formatter(get_data_from_one_geographical_code(country_code.upper()))
                 }, 200
         except OSError as e:
             abort(503, message=str(e), status=503)
         except SDGFilteringException as e:
-            abort(404, message=str(e), status=404)
+            abort(404, message=str(e) + "fuck", status=404)

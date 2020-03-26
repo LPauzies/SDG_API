@@ -10,6 +10,6 @@ from app.resources.SDGByCountryCodeGoalsResource import SDGByCountryCodeGoalsRes
 api.add_resource(SDGCountryResource, '/api/sdg/countries')
 api.add_resource(SDGGoalsResource, '/api/sdg/goals')
 
-api.add_resource(SDGByCountryResource, '/api/sdg/<string:country>')
-api.add_resource(SDGByCountryCodeResource, '/api/sdg/<int:country_code>')
-api.add_resource(SDGByCountryCodeGoalsResource, '/api/sdg/<int:country_code>/<string:topic>')
+api.add_resource(SDGByCountryResource, '/api/sdg/country/<string:country>')
+api.add_resource(SDGByCountryCodeResource, '/api/sdg/countrycode/<string:country_code>')
+api.add_resource(SDGByCountryCodeGoalsResource, '/api/sdg/<string:country_code>/<string:topic>')

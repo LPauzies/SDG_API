@@ -1,6 +1,5 @@
 import pandas as pd
 
-from typing import Union
 from app.config import DATA_PATH
 
 class SDGFilteringException(Exception):
@@ -25,8 +24,8 @@ def _is_country_contained_in_values(df: pd.DataFrame, country: str) -> bool:
             return country_
     return None
 
-def _is_country_code_existing(df: pd.DataFrame, country_code: int) -> bool:
-    return country_code in df.GeoAreaCode.values
+def _is_country_code_existing(df: pd.DataFrame, country_code: str) -> bool:
+    return country_code in df.Country_code.values
 
 ### PUBLIC FUNCTIONS ###
 # Can raise OSError if CSV is not accessible
@@ -41,22 +40,22 @@ def get_data_from_one_country(country: str) -> pd.DataFrame:
         else:
             raise SDGFilteringException("This country is not referenced in our API")
 
-def get_data_from_one_geographical_code(country_code: int) -> pd.DataFrame:
+def get_data_from_one_geographical_code(country_code: str) -> pd.DataFrame:
     df = _read_data()
     if (_is_country_code_existing(df, country_code)):
-        return df[df['GeoAreaCode'] == country_code]
+        return df[df['Country_code'] == country_code]
     else:
         raise SDGFilteringException("This country code is not referenced in our API")
 
 def get_countries() -> pd.DataFrame:
     df = _read_data()
-    return df[['GeoAreaName', 'GeoAreaCode']].drop_duplicates()
+    return df[['GeoAreaName', 'GeoAreaCode', 'Country_code', 'Latitude', 'Longitude']].drop_duplicates()
 
 def get_goals() -> pd.DataFrame:
     df = _read_data()
     return df[['SeriesCode', 'SeriesDescription']].drop_duplicates()
 
-def get_topic_from_one_country(country_code: int, topic: str) -> pd.DataFrame:
+def get_topic_from_one_country(country_code: str, topic: str) -> pd.DataFrame:
     df = get_data_from_one_geographical_code(country_code)
     if (_is_topic_existing(df, topic)):
         return df[df['SeriesCode'] == topic]
