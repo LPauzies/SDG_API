@@ -157,4 +157,35 @@ def sdg_formatter_goal_country(df: pd.DataFrame) -> Any:
                 s = "NULL" if str(row[col] == "nan") else str(row[col])
                 data['extra data'].append("{}:{}".format(col,s))
         json['data'].append(data)
-    return marshal(json,sdg_formatter_goal_country_goals_fields)
+    return marshal(json, sdg_formatter_goal_country_goals_fields)
+
+# SDG Formatter for a topic
+sdg_formatter_topic_data_country_fields = {
+    'country': fields.String,
+    'country code': fields.String,
+    'value': fields.String
+}
+
+sdg_formatter_topic_data_fields = {
+    'goal': fields.String,
+    'goal code': fields.String,
+    'unit': fields.String,
+    'source': fields.String,
+    'data': fields.List(fields.Nested(sdg_formatter_topic_data_country_fields))
+}
+
+def sdg_formatter_topic_data(df: pd.DataFrame) -> Any:
+    json = {}
+    json['goal'] = df['SeriesDescription'].values[0]
+    json['goal code'] = df['SeriesCode'].values[0]
+    json['unit'] = df['Units'].values[0]
+    json['source'] = df['Source'].values[0]
+    df_data = df.drop(columns=['SeriesCode', 'SeriesDescription', 'Units', 'Source', 'GeoAreaCode', 'Latitude', 'Longitude', 'TimePeriod', 'Age', 'Education_level', 'Location', 'Mode_of_transportation', 'Sex'])
+    json['data'] = []
+    for _, row in df_data.iterrows():
+        data = {}
+        data['country'] = row['GeoAreaName']
+        data['country code'] = row['Country_code']
+        data['value'] = row['Value']
+        json['data'].append(data)
+    return marshal(json, sdg_formatter_topic_data_fields)

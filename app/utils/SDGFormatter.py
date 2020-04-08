@@ -15,6 +15,9 @@ def _standardize_column_names(df: pd.DataFrame) -> pd.DataFrame:
 def _ignore_non_ascii_characters(df: pd.DataFrame) -> pd.DataFrame:
     return df[df['GeoAreaName'].str.len().eq(df['GeoAreaName'].str.encode('ascii', errors='ignore').str.len())]
 
+def _remove_NV_values(df: pd.DataFrame) -> pd.DataFrame:
+    return df[df['Value'] != "NV"];
+
 def _upper_country_values(df: pd.DataFrame) -> pd.DataFrame:
     df['GeoAreaName'] = df['GeoAreaName'].apply(lambda x : x.upper())
     return df
@@ -38,6 +41,7 @@ if __name__ == '__main__':
     df_data = _read_data()
     df_data = _standardize_column_names(df_data)
     df_data = _ignore_non_ascii_characters(df_data)
+    df_data = _remove_NV_values(df_data)
     df_data = _upper_country_values(df_data)
     df_data = _suppress_useless_columns(df_data)
     df_data = df_data.sort_values(by=['GeoAreaName'])
