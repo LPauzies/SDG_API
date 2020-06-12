@@ -6,7 +6,7 @@ backports.functools-lru-cache==1.5
 click==7.1.1
 configparser==3.8.1
 contextlib2==0.5.5
-cryptography==2.1.4
+cryptography==2.3
 dnspython==1.15.0
 enum34==1.1.6
 Flask==1.1.1
