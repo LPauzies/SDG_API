@@ -10,7 +10,7 @@ Install prerequisites in virtual environment : `pip install -r requirements.txt`
 
 # How to launch the app
 
-Go to your virtual environment : `python3 api.py`
+Go to your virtual environment : `python3 api.py -s SERVER_URL -p SERVER_PORT`
 
 # How to quit virtual env
 
